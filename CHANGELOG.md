@@ -2,11 +2,12 @@
 
 All notable changes to this project are documented here. The project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.1.2] - 2026-11-03
 
 ### Added
 
 - An icon: a felt owl with a pencil on a three-rung ladder, also at the top of the README.
+- `plugin.json` links to the documentation, the issue tracker and the data-handling notes.
 
 ### Changed
 

@@ -1,6 +1,6 @@
 {
   "name": "prompt-ladder",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Claude does what you ask, so ask well. Press ctrl+x ctrl+p on a rough draft and prompt-ladder writes a well-built prompt from your session's own context, at the cost you pick: quick, balanced or deep.",
   "author": {
     "name": "JunSeo99",

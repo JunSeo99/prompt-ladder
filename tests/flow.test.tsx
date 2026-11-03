@@ -68,7 +68,6 @@ function engine(on: any, reply: (clock: any) => any, files: Record<string, strin
   on('session.root', () => ({ value: '/work/app' }))
   on('session.model', () => ({ value: 'claude-opus-5-5' }))
   on('session.usage', () => ({ value: { startedAt: 0, context: { tokens: contextTokens, window: 1_000_000 }, rateLimits: [] } }))
-  on('process.run', () => ({ value: { exitCode: 0, stdout: 'main\n', stderr: '' } }))
   on('ui.toast', (_: any, e: any) => {
     seen.toasts.push(e.text)
     return { value: undefined }
@@ -154,7 +153,6 @@ test('before the first turn it calls the session model directly with the session
   expect(call.system).toContain('You rewrite a draft prompt')
   expect(call.prompt).toContain('Never use Playwright.')
   expect(call.prompt).toContain('- design-taste-frontend: Anti-slop frontend.')
-  expect(call.prompt).toContain('Git branch: main')
   expect(call.prompt).toContain('<draft>\nadd a login test\n</draft>')
   expect(call.promptBlocks?.[0]?.cache).toBe(true)
 

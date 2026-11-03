@@ -63,7 +63,6 @@ test('a long command list is cut with a count, not silently', () => {
 test('the context block keeps its sections and marks an empty conversation', () => {
   const context = buildContext({
     cwd: '/work/app',
-    branch: 'main',
     model: 'claude-opus-5-5',
     instructions: [{ path: '/work/app/CLAUDE.md', text: 'Use pnpm.' }],
     commands: [{ name: 'design-taste-frontend', description: 'Anti-slop frontend skill.' }],
@@ -71,7 +70,7 @@ test('the context block keeps its sections and marks an empty conversation', () 
     agents: ['Explore'],
     messages: [],
   })
-  for (const part of ['<environment>', 'Git branch: main', '## /work/app/CLAUDE.md\nUse pnpm.', '- design-taste-frontend: Anti-slop frontend skill.', '<subagent_types>\nExplore', '(no messages yet)']) {
+  for (const part of ['<environment>', 'Model: claude-opus-5-5', '## /work/app/CLAUDE.md\nUse pnpm.', '- design-taste-frontend: Anti-slop frontend skill.', '<subagent_types>\nExplore', '(no messages yet)']) {
     expect(context).toContain(part)
   }
 })

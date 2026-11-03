@@ -9,7 +9,7 @@ prompt-ladder runs inside your Claude Code session with that session's credentia
 | The draft in the prompt box | `$.prompt.read()` | When you press the chord |
 | Context size | `$.session.usage()` (local, no request) | When you press the chord |
 | The session's skills, commands and tools, recent messages | `$.command.list()`, `$.tool.list()`, `$.session.messages()` | On each rewrite, to check the names a candidate uses |
-| CLAUDE.md files, the memory index, subagent definitions, git branch | `~/.claude/CLAUDE.md`, `<project>/CLAUDE.md`, `<project>/.claude/CLAUDE.md`, `<project>/CLAUDE.local.md`, `~/.claude/projects/<project>/memory/MEMORY.md`, `~/.claude/agents/`, `<project>/.claude/agents/`, `git branch --show-current` | Only for a direct call, the first rewrite before any turn has finished |
+| CLAUDE.md files, the memory index, subagent definitions | `~/.claude/CLAUDE.md`, `<project>/CLAUDE.md`, `<project>/.claude/CLAUDE.md`, `<project>/CLAUDE.local.md`, `~/.claude/projects/<project>/memory/MEMORY.md`, `~/.claude/agents/`, `<project>/.claude/agents/` | Only for a direct call, the first rewrite before any turn has finished |
 | Keybindings | `~/.claude/keybindings.json` (or under `CLAUDE_CONFIG_DIR`) | At session start, and on `/prompt-ladder setup` |
 
 ## Where it goes

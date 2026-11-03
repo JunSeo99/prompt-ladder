@@ -94,7 +94,7 @@ band above the prompt + recommended rung in the box (only if the draft is unchan
 ```
 
 - **Fork first.** A fork resends the session's last request (system prompt, tools, messages) with the rewrite request at the end. Prefix caching only works on the same model, so prompt-ladder deliberately uses your session's model rather than a cheaper one. Its own instructions (about 1k tokens) go last and are the only uncached input.
-- **Direct call before the first turn.** There is nothing to fork yet, so prompt-ladder builds the context itself: your CLAUDE.md files and memory index, the skills and commands, subagent types, built-in tools and MCP servers, git branch, and recent messages. Each part is capped, and the context block is cached, so a second rewrite within a few minutes reads most of it from the cache.
+- **Direct call before the first turn.** There is nothing to fork yet, so prompt-ladder builds the context itself: your CLAUDE.md files and memory index, the skills and commands, subagent types, built-in tools and MCP servers, and recent messages. It runs no programs. Each part is capped, and the context block is cached, so a second rewrite within a few minutes reads most of it from the cache.
 - **The band** is drawn by a `ui.render` hook on the `AbovePrompt` site, with digit hotkeys and an elapsed-time ticker.
 
 Measured on Claude Code 2.1.317, Opus 5.5, in a setup with about 400 skills and commands. The fork row covers five runs of the demo above, in English and Korean:

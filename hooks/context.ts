@@ -6,7 +6,6 @@ import { clip } from './ladder'
  */
 export type SessionFacts = {
   cwd: string
-  branch?: string
   model: string
   /** CLAUDE.md files and the memory index, path first. */
   instructions: { path: string; text: string }[]
@@ -89,7 +88,7 @@ export function formatMessages(messages: SessionFacts['messages']): string {
 
 /** The <context> block of a direct call. Stable parts first, so they cache. */
 export function buildContext(facts: SessionFacts): string {
-  const environment = [`Working directory: ${facts.cwd}`, facts.branch ? `Git branch: ${facts.branch}` : '', `Model: ${facts.model}`]
+  const environment = [`Working directory: ${facts.cwd}`, `Model: ${facts.model}`]
     .filter(Boolean)
     .join('\n')
   return [

@@ -6,7 +6,11 @@ All notable changes to this project are documented here. The project follows [Se
 
 ### Added
 
-- An icon: a felt owl with a pencil on a three-rung ladder (`.claude-plugin/icon.png`, also at the top of the README).
+- An icon: a felt owl with a pencil on a three-rung ladder, also at the top of the README.
+
+### Changed
+
+- The direct call (the first rewrite of a session) no longer runs `git` to read the branch name. prompt-ladder now starts no programs.
 
 ## [0.1.1] - 2026-11-03
 

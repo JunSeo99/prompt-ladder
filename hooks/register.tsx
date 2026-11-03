@@ -92,7 +92,6 @@ async function gather($: EngineInterface): Promise<SessionFacts> {
   const cwd = await $.session.cwd()
   const root = await safe($.session.root(), cwd)
   const model = await $.session.model()
-  const branch = await safe($.process.run(['git', '-C', root, 'branch', '--show-current'], { timeoutMs: 3000 }), undefined)
 
   const paths = [`${dir}/CLAUDE.md`, `${root}/CLAUDE.md`, `${root}/.claude/CLAUDE.md`, `${root}/CLAUDE.local.md`]
   if (cwd !== root) paths.push(`${cwd}/CLAUDE.md`)
@@ -106,7 +105,6 @@ async function gather($: EngineInterface): Promise<SessionFacts> {
   const commands = (await safe($.command.list(), [])).filter(command => command.source !== 'builtin')
   return {
     cwd,
-    branch: branch?.exitCode === 0 ? branch.stdout.trim() || undefined : undefined,
     model,
     instructions,
     commands,

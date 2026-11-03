@@ -1,5 +1,7 @@
 <div align="center">
 
+![prompt-ladder 부엉이](assets/logo.png)
+
 # Prompt Ladder
 
 ### Claude는 시킨 대로 합니다. 그러니 잘 시켜야 합니다.

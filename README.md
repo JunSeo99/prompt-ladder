@@ -1,5 +1,7 @@
 <div align="center">
 
+![prompt-ladder owl](assets/logo.png)
+
 # Prompt Ladder
 
 ### Claude does what you ask. So ask well.

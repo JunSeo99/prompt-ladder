@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- An icon: a felt owl with a pencil on a three-rung ladder (`.claude-plugin/icon.png`, also at the top of the README).
+
 ## [0.1.1] - 2026-11-03
 
 No change to the mod's behavior.

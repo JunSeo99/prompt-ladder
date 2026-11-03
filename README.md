@@ -6,7 +6,7 @@
 
 ### Claude does what you ask. So ask well.
 
-Type a rough draft and press `ctrl+x ctrl+p`. prompt-ladder writes the prompt you would have written with ten more minutes, from your session's own context: what to read first, how to proceed, which of your skills and agents to use, and how to know it is done. You choose how much it spends, from quick to deep.
+Type a rough draft and press `ctrl+q`. prompt-ladder writes the prompt you would have written with ten more minutes, from your session's own context: what to read first, how to proceed, which of your skills and agents to use, and how to know it is done. You choose how much it spends, from quick to deep.
 
 [![CI](https://github.com/JunSeo99/prompt-ladder/actions/workflows/ci.yml/badge.svg)](https://github.com/JunSeo99/prompt-ladder/actions/workflows/ci.yml) [![MIT](https://img.shields.io/badge/license-MIT-2f6650)](LICENSE) ![Claude Code mod](https://img.shields.io/badge/Claude%20Code-mod-D97757) ![Tested on 2.1.317](https://img.shields.io/badge/tested%20on-2.1.317-lightgrey)
 
@@ -14,7 +14,7 @@ Type a rough draft and press `ctrl+x ctrl+p`. prompt-ladder writes the prompt yo
 
 </div>
 
-![A real Claude Code session: the draft "users say they get logged out after a few minutes. fix it", then ctrl+x ctrl+p, then three prompts from Quick to Deep with the recommended one in the prompt box](assets/demo.gif)
+![A real Claude Code session: the draft "users say they get logged out after a few minutes. fix it", then the shortcut, then three prompts from Quick to Deep with the recommended one in the prompt box](assets/demo.gif)
 
 <sub>A real session in Ghostty, on a demo Next.js app whose users get logged out after five minutes. Claude had already read the auth code in one turn, so the rewrite cites what it found. The 39-second rewrite is fast-forwarded.</sub>
 
@@ -37,7 +37,7 @@ At the prompt of a Claude Code session:
 /prompt-ladder setup
 ```
 
-The second line adds `ctrl+x ctrl+p` → `command:prompt-ladder` to the Chat context of `~/.claude/keybindings.json`. It never overwrites a binding. If that chord is already taken, it tells you and changes nothing. Restart Claude Code if the chord does not respond yet.
+The second line adds `ctrl+q` → `command:prompt-ladder` to the Chat context of `~/.claude/keybindings.json`. It never overwrites a binding. If that key is already taken, it tells you and changes nothing; name another with `/prompt-ladder setup <key>`, for example `/prompt-ladder setup meta+l`. Set up with an older version, on `ctrl+x ctrl+p`? Run `/prompt-ladder setup ctrl+q` to move. Restart Claude Code if the key does not respond yet.
 
 From a shell: `claude plugin install prompt-ladder --marketplace JunSeo99/prompt-ladder`.
 
@@ -55,14 +55,15 @@ From a shell: `claude plugin install prompt-ladder --marketplace JunSeo99/prompt
 ## Use it
 
 1. Type a draft in the prompt box, as rough as you like.
-2. Press `ctrl+x ctrl+p`. The band above the prompt counts seconds while the rewrite runs.
-3. The recommended prompt lands in the box. Read it, edit it, or press Enter.
+2. Press `ctrl+q`. The band above the prompt counts seconds while the rewrite runs.
+3. The recommended prompt lands in the box. Press `ctrl+q` again for the next one, edit it, or press Enter to send.
 
 | Key | What it does |
 |---|---|
-| `ctrl+x ctrl+p` | Rewrite the draft. Pressed again while the box holds the draft or a candidate, it moves to the next one: draft → 1 → 2 → 3 → draft. After you edit the box, it rewrites your edited text. |
+| `ctrl+q` | Rewrite the draft. Press it again to walk the candidates: the box moves to the next one, then back to your draft (draft → 1 → 2 → 3 → draft). After you edit the box, it rewrites your edited text. |
 | `ctrl+x tab`, then a key | Focus the band, then: `1` `2` `3` put that candidate in the box, `0` puts your draft back, `r` retries, `x` closes the band or cancels a running rewrite. Focus returns to the prompt after the press. |
 | `/prompt-ladder <text>` | Rewrite text you type after the command, for when no chord is bound |
+| `/prompt-ladder setup <key>` | Use another key, such as `meta+l`. It moves the binding and never overwrites anything else. |
 
 ## The ladder
 
@@ -85,13 +86,7 @@ The rules every candidate follows:
 
 ## How it works
 
-```text
-ctrl+x ctrl+p ─► /prompt-ladder ─► read the draft ─┬─ session has a finished turn ─► $.model.fork (same model, cached prefix)
-                                                   └─ first prompt / after /clear ─► $.model.complete on the session's model
-                                                                                     with CLAUDE.md, memory, skills, tools, agents
-                      ◄─ JSON ladder ◄─ parse, check names against the session ◄─┘
-band above the prompt + recommended rung in the box (only if the draft is unchanged)
-```
+![The session fork: your session's full context (system prompt, CLAUDE.md, memory, skills, agents, tools and the conversation) comes from the prompt cache, the draft and rewrite rules are the only new tokens, the same model writes the ladder with no tools, and the recommended rung goes into the prompt box if the draft is unchanged](assets/fork.png)
 
 - **Fork first.** A fork resends the session's last request (system prompt, tools, messages) with the rewrite request at the end. Prefix caching only works on the same model, so prompt-ladder deliberately uses your session's model rather than a cheaper one. Its own instructions (about 1k tokens) go last and are the only uncached input.
 - **Direct call before the first turn.** There is nothing to fork yet, so prompt-ladder builds the context itself: your CLAUDE.md files and memory index, the skills and commands, subagent types, built-in tools and MCP servers, and recent messages. It runs no programs. Each part is capped, and the context block is cached, so a second rewrite within a few minutes reads most of it from the cache.
@@ -138,7 +133,7 @@ The band speaks Korean when Claude Code's `language` setting is Korean (or, with
 | Symptom | Cause and fix |
 |---|---|
 | The chord does nothing | No binding. Run `/prompt-ladder setup`, then restart Claude Code. Check `/keybindings` for `command:prompt-ladder`. |
-| Setup says the chord is taken | Something else uses `ctrl+x ctrl+p`. Bind any free chord to `command:prompt-ladder` in `/keybindings`. |
+| Setup says the chord is taken | Something else uses `ctrl+q`. Name another key with `/prompt-ladder setup <key>`, or bind one to `command:prompt-ladder` in `/keybindings`. |
 | No band | The band is drawn in the terminal and the Desktop app, not in the VS Code extension. There, when the box takes no fill, the candidates are printed as transcript lines instead. The band also hides while it is collapsed (`ctrl+x ctrl+a` toggles it) and while a survey holds it. |
 | "The draft holds a pasted block or an image" | The box shows a paste or an image as a placeholder, and a rewrite would drop what it stands for. Rewrite the text first, then paste. |
 | Typing a digit into an empty box picked a rung | Claude Code presses a band button when its digit is typed alone into an empty prompt. Send or close (`x`) the ladder first, or start the line with another character. |

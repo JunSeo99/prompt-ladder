@@ -2,13 +2,13 @@ import { expect, test } from 'claude-code/testing'
 
 import { buildContext, formatCommands, formatTools, memoryIndexPath } from '../hooks/context'
 import { padCells, pickLang, tokens } from '../hooks/i18n'
-import { ensureBinding, findChord } from '../hooks/keybinding'
+import { asChord, ensureBinding, findChord } from '../hooks/keybinding'
 
 test('setup creates a keybindings file when there is none', () => {
   const result = ensureBinding(undefined)
   if (result.status !== 'added') throw new Error(result.status)
   const file = JSON.parse(result.text)
-  expect(file.bindings).toEqual([{ context: 'Chat', bindings: { 'ctrl+x ctrl+p': 'command:prompt-ladder' } }])
+  expect(file.bindings).toEqual([{ context: 'Chat', bindings: { 'ctrl+q': 'command:prompt-ladder' } }])
   expect(file.$schema).toContain('claude-code-keybindings')
 })
 
@@ -24,13 +24,13 @@ test('setup adds to the Chat block and keeps every other binding', () => {
   if (result.status !== 'added') throw new Error(result.status)
   const file = JSON.parse(result.text)
   expect(file.bindings[0]).toEqual({ context: 'Global', bindings: { 'ctrl+t': 'app:toggleTodos' } })
-  expect(file.bindings[1].bindings).toEqual({ 'ctrl+g': 'chat:externalEditor', 'ctrl+s': null, 'ctrl+x ctrl+p': 'command:prompt-ladder' })
-  expect(findChord(result.text)).toBe('ctrl+x ctrl+p')
+  expect(file.bindings[1].bindings).toEqual({ 'ctrl+g': 'chat:externalEditor', 'ctrl+s': null, 'ctrl+q': 'command:prompt-ladder' })
+  expect(findChord(result.text)).toBe('ctrl+q')
 })
 
 test('setup never overwrites a chord that does something else', () => {
-  const raw = JSON.stringify({ bindings: [{ context: 'Chat', bindings: { 'ctrl+x ctrl+p': 'chat:stash' } }] })
-  expect(ensureBinding(raw)).toEqual({ status: 'conflict', chord: 'ctrl+x ctrl+p', existing: 'chat:stash' })
+  const raw = JSON.stringify({ bindings: [{ context: 'Chat', bindings: { 'ctrl+q': 'chat:stash' } }] })
+  expect(ensureBinding(raw)).toEqual({ status: 'conflict', chord: 'ctrl+q', existing: 'chat:stash' })
 })
 
 test('setup leaves an existing binding of the command alone, whatever its chord', () => {
@@ -98,12 +98,12 @@ test('numbers and widths render for a terminal', () => {
 
 test('setup sees a taken chord in any context and any spelling', () => {
   const raw = JSON.stringify({ bindings: [{ context: 'Global', bindings: { 'Ctrl+X  Ctrl+P': 'app:toggleTodos' } }] })
-  expect(ensureBinding(raw)).toEqual({ status: 'conflict', chord: 'Ctrl+X  Ctrl+P', existing: 'app:toggleTodos' })
+  expect(ensureBinding(raw, 'ctrl+x ctrl+p')).toEqual({ status: 'conflict', chord: 'Ctrl+X  Ctrl+P', existing: 'app:toggleTodos' })
 })
 
 test('setup will not turn a reclaimed ctrl+x back into a prefix', () => {
   const raw = JSON.stringify({ bindings: [{ context: 'Chat', bindings: { 'ctrl+x ctrl+k': null, 'ctrl+x': 'chat:newline' } }] })
-  expect(ensureBinding(raw)).toEqual({ status: 'conflict', chord: 'ctrl+x', existing: 'chat:newline' })
+  expect(ensureBinding(raw, 'ctrl+x ctrl+p')).toEqual({ status: 'conflict', chord: 'ctrl+x', existing: 'chat:newline' })
 })
 
 test('a damaged block is skipped, kept, and never crashes the lookup', () => {
@@ -113,5 +113,30 @@ test('a damaged block is skipped, kept, and never crashes the lookup', () => {
   if (result.status !== 'added') throw new Error(result.status)
   const file = JSON.parse(result.text)
   expect(file.bindings[0]).toBe(null)
-  expect(file.bindings[2].bindings).toEqual({ 'ctrl+g': 'chat:externalEditor', 'ctrl+x ctrl+p': 'command:prompt-ladder' })
+  expect(file.bindings[2].bindings).toEqual({ 'ctrl+g': 'chat:externalEditor', 'ctrl+q': 'command:prompt-ladder' })
+})
+
+test('a named key moves the binding from its old chord and says which', () => {
+  const raw = JSON.stringify({ bindings: [{ context: 'Chat', bindings: { 'ctrl+g': 'chat:externalEditor', 'ctrl+x ctrl+p': 'command:prompt-ladder' } }] })
+  expect(ensureBinding(raw)).toEqual({ status: 'present', chord: 'ctrl+x ctrl+p' })
+  const result = ensureBinding(raw, 'Ctrl+Q')
+  if (result.status !== 'added') throw new Error(result.status)
+  expect(result.chord).toBe('ctrl+q')
+  expect(result.previous).toBe('ctrl+x ctrl+p')
+  expect(JSON.parse(result.text).bindings[0].bindings).toEqual({ 'ctrl+g': 'chat:externalEditor', 'ctrl+q': 'command:prompt-ladder' })
+  expect(ensureBinding(result.text, 'ctrl+q')).toEqual({ status: 'present', chord: 'ctrl+q' })
+})
+
+test('a single key that starts another chord is taken', () => {
+  const raw = JSON.stringify({ bindings: [{ context: 'Chat', bindings: { 'ctrl+q ctrl+w': 'chat:stash' } }] })
+  expect(ensureBinding(raw)).toEqual({ status: 'conflict', chord: 'ctrl+q ctrl+w', existing: 'chat:stash' })
+})
+
+test('setup names a key only when every word is one', () => {
+  expect(asChord('Ctrl+Q')).toBe('ctrl+q')
+  expect(asChord('ctrl+x  ctrl+p')).toBe('ctrl+x ctrl+p')
+  expect(asChord('meta+l')).toBe('meta+l')
+  expect(asChord('f5')).toBe('f5')
+  expect(asChord('a CI pipeline')).toBeUndefined()
+  expect(asChord('ctrl+q please')).toBeUndefined()
 })

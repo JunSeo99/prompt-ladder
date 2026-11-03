@@ -269,9 +269,29 @@ test('setup binds the chord in keybindings.json and says so', async ($, on) => {
   expect(seen.writes.length).toBe(1)
   expect(JSON.parse(seen.writes[0]?.text ?? '{}').bindings[0].bindings).toEqual({
     'ctrl+g': 'chat:externalEditor',
-    'ctrl+x ctrl+p': 'command:prompt-ladder',
+    'ctrl+q': 'command:prompt-ladder',
   })
-  expect(seen.logs.some(text => text.includes('Bound ctrl+x ctrl+p'))).toBe(true)
+  expect(seen.logs.some(text => text.includes('Bound ctrl+q'))).toBe(true)
+})
+
+test('setup with a key moves the binding; setup with words is a draft', async ($, on) => {
+  const path = '/home/me/.claude/keybindings.json'
+  const files = { [path]: JSON.stringify({ bindings: [{ context: 'Chat', bindings: { 'ctrl+x ctrl+p': 'command:prompt-ladder' } }] }) }
+  const { seen, clock } = engine(on, answered, files)
+  await $.session.start({ cwd: '/work/app', surface: 'terminal', isInteractive: true })
+
+  await $.command.run({ ...RUN, command: 'prompt-ladder', args: 'setup' })
+  expect(seen.writes.length).toBe(0)
+  expect(seen.logs.some(text => text.includes('run /prompt-ladder setup ctrl+q'))).toBe(true)
+
+  await $.command.run({ ...RUN, command: 'prompt-ladder', args: 'setup ctrl+q' })
+  expect(JSON.parse(seen.writes[0]?.text ?? '{}').bindings[0].bindings).toEqual({ 'ctrl+q': 'command:prompt-ladder' })
+  expect(seen.logs.some(text => text.includes('in place of ctrl+x ctrl+p'))).toBe(true)
+
+  await $.command.run({ ...RUN, command: 'prompt-ladder', args: 'setup a CI pipeline' })
+  await clock.settle()
+  expect(seen.writes.length).toBe(1)
+  expect(seen.forks[0]).toContain('setup a CI pipeline')
 })
 
 test('a heavy session plans a handoff and says so in the band', async ($, on) => {

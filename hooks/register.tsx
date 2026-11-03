@@ -5,7 +5,7 @@ import type { Engine, Ladder, Lang, View } from '../types'
 import { buildContext, memoryIndexPath } from './context'
 import type { SessionFacts } from './context'
 import { padCells, pickLang, strings, tokens } from './i18n'
-import { DEFAULT_CHORD, ensureBinding, findChord } from './keybinding'
+import { DEFAULT_CHORD, asChord, ensureBinding, findChord, normalize } from './keybinding'
 import { BUILT_IN_AGENTS, boxEntry, directSystem, draftBlock, forkPrompt, isHeavy, nextEntry, parseLadder, toCount, unknownNames } from './ladder'
 import type { Count, Heavy } from './ladder'
 
@@ -271,7 +271,7 @@ async function retry($: EngineInterface, settings: Settings): Promise<void> {
   await start($, isEdited && box.text.trim() ? box.text : current.draft, box.text, settings)
 }
 
-async function setup($: EngineInterface): Promise<void> {
+async function setup($: EngineInterface, named?: string): Promise<void> {
   const path = `${await configDir($)}/keybindings.json`
   const t = strings(await langFor($, ''))
   let raw: string | undefined
@@ -282,7 +282,7 @@ async function setup($: EngineInterface): Promise<void> {
       return
     }
   }
-  const result = ensureBinding(raw)
+  const result = ensureBinding(raw, named)
   if (result.status === 'added') {
     try {
       await $.fs.write(path, result.text)
@@ -291,10 +291,11 @@ async function setup($: EngineInterface): Promise<void> {
       return
     }
     chord = result.chord
-    $.ui.log(t.setup.added(result.chord))
+    $.ui.log(t.setup.added(result.chord, result.previous))
   } else if (result.status === 'present') {
     chord = result.chord
-    $.ui.log(t.setup.present(result.chord))
+    // An older install's chord stays until asked; say how to move to the default.
+    $.ui.log(t.setup.present(result.chord, normalize(result.chord) === DEFAULT_CHORD ? undefined : DEFAULT_CHORD))
   } else if (result.status === 'conflict') {
     $.ui.log(t.setup.conflict(result.chord, result.existing))
   } else {
@@ -317,8 +318,8 @@ export const register: Register = (on, options) => {
     try {
       await $.command.register({
         name: PLUGIN,
-        description: 'Rewrite your draft into prompts from quick to deep ("setup" binds ctrl+x ctrl+p)',
-        argumentHint: '[text | setup]',
+        description: `Rewrite your draft into prompts from quick to deep ("setup" binds ${DEFAULT_CHORD})`,
+        argumentHint: '[text | setup [key]]',
         immediate: true,
       })
     } catch {
@@ -334,8 +335,10 @@ export const register: Register = (on, options) => {
 
   on('command.run', { command: PLUGIN }, async ($, e) => {
     const args = (e.args ?? '').trim()
-    if (args === 'setup') {
-      await setup($)
+    // "setup ctrl+k" names a key; "setup a CI pipeline" is a draft.
+    const named = args.startsWith('setup ') ? asChord(args.slice(6)) : undefined
+    if (args === 'setup' || named) {
+      await setup($, named)
       return {}
     }
 

@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here. The project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- The shortcut is `ctrl+q`, one press. Press it again to walk the candidates (draft → 1 → 2 → 3 → draft), then Enter. `/prompt-ladder setup <key>` binds another key and moves an existing binding; plain `setup` keeps an older `ctrl+x ctrl+p` binding and says how to move it. A single key that starts another chord counts as taken.
+- README (English and Korean): How it works shows a diagram of the session fork, what the rewriter reads and what comes back, in place of the text flow.
+
 ## [0.1.2] - 2026-11-03
 
 ### Added

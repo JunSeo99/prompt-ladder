@@ -27,8 +27,8 @@ export type Strings = {
   busy: string
   setupHint: string
   setup: {
-    added: (chord: string) => string
-    present: (chord: string) => string
+    added: (chord: string, previous?: string) => string
+    present: (chord: string, suggested?: string) => string
     conflict: (chord: string, existing: string) => string
     invalid: (path: string) => string
   }
@@ -66,12 +66,14 @@ const en: Strings = {
   tooLong: 'The draft is over 20,000 characters. Shorten it, or attach long text as a file.',
   placeholder: 'The draft holds a pasted block or an image, which a rewrite would drop. Rewrite the text before pasting.',
   busy: 'Still rewriting this draft.',
-  setupHint: 'No shortcut yet. Run /prompt-ladder setup to bind ctrl+x ctrl+p.',
+  setupHint: 'No shortcut yet. Run /prompt-ladder setup to bind ctrl+q.',
   setup: {
-    added: chord => `Bound ${chord} to /prompt-ladder in the Chat context. Restart Claude Code if it does not respond yet.`,
-    present: chord => `Already bound: ${chord} runs /prompt-ladder.`,
+    added: (chord, previous) =>
+      `Bound ${chord} to /prompt-ladder in the Chat context${previous ? `, in place of ${previous}` : ''}. Restart Claude Code if it does not respond yet.`,
+    present: (chord, suggested) =>
+      `Already bound: ${chord} runs /prompt-ladder.${suggested ? ` To switch to ${suggested}, run /prompt-ladder setup ${suggested}.` : ''}`,
     conflict: (chord, existing) =>
-      `${chord} already runs ${existing}, so nothing changed. Bind another chord to "command:prompt-ladder" in /keybindings.`,
+      `${chord} already runs ${existing}, so nothing changed. Name another key with /prompt-ladder setup <key>, or bind one to "command:prompt-ladder" in /keybindings.`,
     invalid: path => `Could not read ${path} as JSON, so nothing changed.`,
   },
   errors: {
@@ -108,12 +110,16 @@ const ko: Strings = {
   tooLong: '초안이 2만 자를 넘습니다. 줄이거나 긴 내용은 파일로 붙여 주세요.',
   placeholder: '초안에 붙여넣은 블록이나 이미지가 있어, 다듬으면 그 내용이 빠집니다. 붙여넣기 전에 다듬어 주세요.',
   busy: '이 초안은 아직 다듬는 중입니다.',
-  setupHint: '단축키가 아직 없습니다. /prompt-ladder setup 으로 ctrl+x ctrl+p 를 켜세요.',
+  setupHint: '단축키가 아직 없습니다. /prompt-ladder setup 으로 ctrl+q 를 켜세요.',
   setup: {
-    added: chord => `Chat 컨텍스트에 ${chord} → /prompt-ladder 를 추가했습니다. 바로 안 되면 Claude Code 를 다시 시작하세요.`,
-    present: chord => `이미 설정돼 있습니다: ${chord} 가 /prompt-ladder 를 실행합니다.`,
+    added: (chord, previous) =>
+      previous
+        ? `${previous} 대신 ${chord} 가 /prompt-ladder 를 실행하도록 Chat 컨텍스트를 바꿨습니다. 바로 안 되면 Claude Code 를 다시 시작하세요.`
+        : `Chat 컨텍스트에 ${chord} → /prompt-ladder 를 추가했습니다. 바로 안 되면 Claude Code 를 다시 시작하세요.`,
+    present: (chord, suggested) =>
+      `이미 설정돼 있습니다: ${chord} 가 /prompt-ladder 를 실행합니다.${suggested ? ` ${suggested} 로 바꾸려면 /prompt-ladder setup ${suggested} 를 실행하세요.` : ''}`,
     conflict: (chord, existing) =>
-      `${chord} 는 이미 ${existing} 에 쓰이고 있어 바꾸지 않았습니다. /keybindings 에서 다른 조합을 "command:prompt-ladder" 에 연결하세요.`,
+      `${chord} 는 이미 ${existing} 에 쓰이고 있어 바꾸지 않았습니다. /prompt-ladder setup <키> 로 다른 키를 지정하거나, /keybindings 에서 "command:prompt-ladder" 에 연결하세요.`,
     invalid: path => `${path} 를 JSON 으로 읽지 못해 바꾸지 않았습니다.`,
   },
   errors: {

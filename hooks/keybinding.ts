@@ -1,5 +1,8 @@
-/** The chord `/prompt-ladder setup` binds: free in every default context. */
-export const DEFAULT_CHORD = 'ctrl+x ctrl+p'
+/**
+ * The key `/prompt-ladder setup` binds: one press, free in the Chat and Global
+ * defaults and not one of the prompt's own editing keys (ctrl+a/e/k/u/w/y/p/n).
+ */
+export const DEFAULT_CHORD = 'ctrl+q'
 export const ACTION = 'command:prompt-ladder'
 
 const SCHEMA = 'https://www.schemastore.org/claude-code-keybindings.json'
@@ -15,8 +18,19 @@ function isBlock(value: unknown): value is Block {
 }
 
 /** Key names are case-insensitive and a chord is keys separated by spaces. */
-function normalize(chord: string): string {
+export function normalize(chord: string): string {
   return chord.trim().toLowerCase().split(/\s+/).join(' ')
+}
+
+const KEY = /^(?:(?:ctrl|shift|alt|opt|option|meta|cmd|command|super)\+)+[^\s+]+$|^f\d{1,2}$/
+
+/**
+ * The chord `/prompt-ladder setup <text>` names, when every word of the text is
+ * a modified key or a function key; otherwise the text is a draft to rewrite.
+ */
+export function asChord(text: string): string | undefined {
+  const keys = normalize(text).split(' ')
+  return keys.every(key => KEY.test(key)) ? keys.join(' ') : undefined
 }
 
 function parse(raw: string | undefined): File | undefined {
@@ -42,38 +56,45 @@ export function findChord(raw: string | undefined, action = ACTION): string | un
 }
 
 export type Ensured =
-  | { status: 'added'; chord: string; text: string }
+  | { status: 'added'; chord: string; previous?: string; text: string }
   | { status: 'present'; chord: string }
   | { status: 'conflict'; chord: string; existing: string }
   | { status: 'invalid' }
 
 /**
- * Binds the chord to the action in the Chat context, unless the action is
- * bound already, or the chord (or its first key, reclaimed as a key of its
- * own) does something else in any context. Never overwrites a binding.
+ * Binds the chord to the action in the Chat context. With no chord named, an
+ * existing binding of the action stays as it is; a named chord replaces the
+ * action's own bindings. Never overwrites a binding of anything else: the
+ * chord itself, its first key bound alone (which a chord would turn back into
+ * a prefix), or for a single key a chord that starts with it (which keeps the
+ * key a prefix).
  */
-export function ensureBinding(raw: string | undefined, chord = DEFAULT_CHORD, action = ACTION): Ensured {
+export function ensureBinding(raw: string | undefined, chord?: string, action = ACTION): Ensured {
   const file = parse(raw)
   if (!file) return { status: 'invalid' }
 
   const all = entries(file)
-  const present = all.find(([, bound]) => bound === action)
+  const wanted = normalize(chord ?? DEFAULT_CHORD)
+  const present = all.find(([key, bound]) => bound === action && (chord === undefined || normalize(key) === wanted))
   if (present) return { status: 'present', chord: present[0] }
 
-  const wanted = normalize(chord)
   const prefix = wanted.split(' ')[0] ?? wanted
   for (const [key, bound] of all) {
-    if (typeof bound !== 'string') continue
+    if (typeof bound !== 'string' || bound === action) continue
     const own = normalize(key)
-    // A chord already taken, or its first key bound alone (which a new chord would turn back into a prefix).
-    if (own === wanted || (wanted.includes(' ') && own === prefix)) return { status: 'conflict', chord: key, existing: bound }
+    if (own === wanted || (wanted.includes(' ') && own === prefix) || own.startsWith(`${wanted} `)) {
+      return { status: 'conflict', chord: key, existing: bound }
+    }
   }
 
-  let chat = file.bindings.find((block): block is Block => isBlock(block) && block.context === 'Chat')
+  const previous = all.find(([, bound]) => bound === action)?.[0]
+  const blocks = file.bindings.filter(isBlock)
+  for (const block of blocks) block.bindings = Object.fromEntries(Object.entries(block.bindings).filter(([, bound]) => bound !== action))
+  let chat = blocks.find(block => block.context === 'Chat')
   if (!chat) {
     chat = { context: 'Chat', bindings: {} }
     file.bindings.push(chat)
   }
-  chat.bindings = { ...chat.bindings, [chord]: action }
-  return { status: 'added', chord, text: `${JSON.stringify(file, null, 2)}\n` }
+  chat.bindings = { ...chat.bindings, [wanted]: action }
+  return { status: 'added', chord: wanted, ...(previous ? { previous } : {}), text: `${JSON.stringify(file, null, 2)}\n` }
 }

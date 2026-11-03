@@ -6,7 +6,7 @@
     {
       "name": "prompt-ladder",
       "source": "./",
-      "description": "Claude does what you ask, so ask well. ctrl+x ctrl+p turns a rough draft into the prompt you would have written, from your session's own context, quick to deep."
+      "description": "Claude does what you ask, so ask well. ctrl+q turns a rough draft into the prompt you would have written, from your session's own context, quick to deep."
     }
   ]
 }

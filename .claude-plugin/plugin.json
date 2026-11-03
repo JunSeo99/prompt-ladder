@@ -8,6 +8,10 @@
   },
   "homepage": "https://github.com/JunSeo99/prompt-ladder",
   "repository": "https://github.com/JunSeo99/prompt-ladder",
+  "icon": "./.claude-plugin/icon.png",
+  "documentationUrl": "https://github.com/JunSeo99/prompt-ladder#readme",
+  "supportUrl": "https://github.com/JunSeo99/prompt-ladder/issues",
+  "privacyPolicyUrl": "https://github.com/JunSeo99/prompt-ladder/blob/main/SECURITY.md",
   "license": "MIT",
   "keywords": [
     "prompt",

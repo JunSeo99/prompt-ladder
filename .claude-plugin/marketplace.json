@@ -1,11 +1,12 @@
 {
   "name": "prompt-ladder",
   "owner": { "name": "JunSeo99" },
+  "metadata": { "description": "prompt-ladder, a Claude Code mod that turns a rough draft into a well-built prompt before you send it." },
   "plugins": [
     {
       "name": "prompt-ladder",
       "source": "./",
-      "description": "Rewrite a draft into prompts from quick to deep, priced in tokens and time, before you send it."
+      "description": "Claude does what you ask, so ask well. ctrl+x ctrl+p turns a rough draft into the prompt you would have written, from your session's own context, quick to deep."
     }
   ]
 }

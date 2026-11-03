@@ -4,6 +4,10 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+  # Mods are an early-access API: run against the newest Claude Code every day
+  # so a breaking release shows up here before it shows up in an issue.
+  schedule:
+    - cron: "17 3 * * *"
 
 permissions:
   contents: read
@@ -19,15 +23,23 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Check out repository
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
       - name: Set up Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version: 22
 
-      - name: Install Claude Code
-        run: npm install -g @anthropic-ai/claude-code
+      - name: Install the latest Claude Code
+        run: npm install -g @anthropic-ai/claude-code && claude --version
+
+      - name: Version, changelog and tag agree
+        run: |
+          version=$(node -p "require('./.claude-plugin/plugin.json').version")
+          grep -q "^## \[$version\]" CHANGELOG.md || { echo "CHANGELOG.md has no [$version] section"; exit 1; }
+          if [[ "$GITHUB_REF" == refs/tags/v* ]] && [[ "${GITHUB_REF#refs/tags/v}" != "$version" ]]; then
+            echo "Tag ${GITHUB_REF#refs/tags/} does not match plugin.json version $version"; exit 1
+          fi
 
       - name: Validate the manifest, marketplace and hooks module
         run: claude plugin validate .

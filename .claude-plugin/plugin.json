@@ -1,7 +1,7 @@
 {
   "name": "prompt-ladder",
-  "version": "0.1.0",
-  "description": "Press ctrl+x ctrl+p on a draft: Claude rewrites it into prompts from quick to deep, priced in tokens and time, right above the prompt box.",
+  "version": "0.1.1",
+  "description": "Claude does what you ask, so ask well. Press ctrl+x ctrl+p on a rough draft and prompt-ladder writes a well-built prompt from your session's own context, at the cost you pick: quick, balanced or deep.",
   "author": {
     "name": "JunSeo99",
     "url": "https://github.com/JunSeo99"

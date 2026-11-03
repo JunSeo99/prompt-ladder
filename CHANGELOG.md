@@ -2,6 +2,22 @@
 
 All notable changes to this project are documented here. The project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-11-03
+
+No change to the mod's behavior.
+
+### Changed
+
+- README (English and Korean) opens with a GIF and two screenshots of a real session in Ghostty: a login-expiry bug in a demo Next.js app, the draft, the ladder, and the Balanced and Deep prompts. They replace the text capture.
+- README pitch, the `plugin.json` and marketplace descriptions now lead with prompting: Claude does what you ask, so ask well. A **Why** section explains it. The marketplace has a description of its own.
+- The key table says that `0`, `r` and `x` work after `ctrl+x tab` focuses the band.
+- The measured table covers five fork runs of the demo (1.2k–2.2k new, 63k–66k cached, 26–51 s).
+- CI runs on Node 24 actions (checkout v6.1.0, setup-node v6.5.0, pinned by SHA), runs daily against the latest Claude Code, and fails when the `plugin.json` version has no CHANGELOG section or a `v*` tag disagrees with it.
+
+### Added
+
+- A line under License: prompt-ladder is independent and not affiliated with or endorsed by Anthropic.
+
 ## [0.1.0] - 2026-11-03
 
 ### Added

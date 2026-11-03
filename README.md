@@ -2,9 +2,9 @@
 
 # Prompt Ladder
 
-### Turn a rough draft into a prompt Claude can act on, before you send it.
+### Claude does what you ask. So ask well.
 
-Type what you want, press `ctrl+x ctrl+p`, and choose from prompts that go from quick to thorough, each showing what it costs in tokens and time.
+Type a rough draft and press `ctrl+x ctrl+p`. prompt-ladder writes the prompt you would have written with ten more minutes, from your session's own context: what to read first, how to proceed, which of your skills and agents to use, and how to know it is done. You choose how much it spends, from quick to deep.
 
 [![CI](https://github.com/JunSeo99/prompt-ladder/actions/workflows/ci.yml/badge.svg)](https://github.com/JunSeo99/prompt-ladder/actions/workflows/ci.yml) [![MIT](https://img.shields.io/badge/license-MIT-2f6650)](LICENSE) ![Claude Code mod](https://img.shields.io/badge/Claude%20Code-mod-D97757) ![Tested on 2.1.317](https://img.shields.io/badge/tested%20on-2.1.317-lightgrey)
 
@@ -12,29 +12,19 @@ Type what you want, press `ctrl+x ctrl+p`, and choose from prompts that go from 
 
 </div>
 
-```text
-prompt-ladder small task · moderate — The visual edit is probably small, but the draft does not say which file holds the settings page…
-1: Quick    ▰▱▱ Find the settings page, apply targeted visual fixes
-2: Balanced ▰▰▱ Audit settings page against app patterns, plan, fix, verify recommended ◂ in the box
-3: Deep     ▰▰▰ Screenshot, critique, plan, fix, independent design review
-0: Draft  r: Retry  x: Close  ctrl+x ctrl+p next · ctrl+x tab, then a digit
-Assumes: The settings page is web UI (not CLI config output). The agent should confirm this / Polish within the existing design system…
-direct call · 19.2k new · 0 cached · 1.6k out · 21s
-───────────────────────────────────────────────────────────────────────────────────────────────
-❯ Make the settings page in this repo look better.
-  Before you change anything:
-  - Find where the settings page is rendered. If there is none, or there are several candidates, ask me which one.
-  - Read it and 1–2 other pages, plus the shared styles/components, so you know the existing design patterns and tokens.
-  - Load `make-interfaces-feel-better` and use it as the checklist.
-  Then list the concrete visual problems you found (spacing, hierarchy, grouping, alignment, control consistency,
-  states such as focus/disabled) and give a short plan.
-  If my goal is ambiguous (for example, a full redesign versus polish), ask before you implement.
-  Implement only visual changes. Match the existing style, keep all behavior and copy unchanged, and add no new dependencies.
-  Verify: run the build/type check and the tests. If there is a dev server, open the page and confirm it renders correctly.
-  Finish with a before/after summary of each change.
-```
+![A real Claude Code session: the draft "users say they get logged out after a few minutes. fix it", then ctrl+x ctrl+p, then three prompts from Quick to Deep with the recommended one in the prompt box](assets/demo.gif)
 
-<sub>A real capture. The draft was `make the settings page look better`. The skill it names comes from the session it ran in.</sub>
+<sub>A real session in Ghostty, on a demo Next.js app whose users get logged out after five minutes. Claude had already read the auth code in one turn, so the rewrite cites what it found. The 39-second rewrite is fast-forwarded.</sub>
+
+| Balanced, recommended and filled in | Deep, picked with `ctrl+x tab` then `3` |
+|---|---|
+| [![Balanced: read five files, confirm the cause, compare three fixes, write Vitest tests first, done when pnpm test and pnpm lint pass](assets/balanced.png)](assets/balanced.png) | [![Deep: root-cause first, load the vercel:nextjs skill, compare three approaches, test first, confirm in the running app, then a security review of the diff](assets/deep.png)](assets/deep.png) |
+
+## Why
+
+Models follow instructions now. Write "users get logged out after a few minutes, fix it" and you may get exactly that: the access token now lasts a day, the logouts stop, the refresh route is still never called, and no test was written. How well you prompt decides the result.
+
+Writing a good prompt every time is work, though. You need to know the context the agent needs, the tools and skills you have, how to break the job down, and what "done" looks like. prompt-ladder does that work in the moment before you press Enter, with your session's own context, and you choose how much it spends.
 
 ## Install
 
@@ -53,9 +43,10 @@ From a shell: `claude plugin install prompt-ladder --marketplace JunSeo99/prompt
 
 | | |
 |---|---|
-| **A ladder, not a rewrite** | Two or three prompts ordered by cost: Quick, Balanced, Deep. The meter `▰▱▱`–`▰▰▰` shows how many tokens and how much time each one asks the agent to spend. |
-| **Prompts that know your session** | The rewriter sees what Claude sees: your CLAUDE.md, memory, the skills, subagents and MCP servers you actually have, and the conversation so far. It names them in backticks. Any name the session cannot confirm is flagged in the band. |
-| **The cache you already paid for** | After the first turn, the rewrite is a fork of the session on the same model, so the prompt cache serves almost all of the input (above: 1.4k new against 59.6k cached). |
+| **What a good prompt has** | Each candidate says what to read first, how to proceed, and how to verify the work. It also says when to stop and ask, so the agent asks before it guesses. |
+| **Built from your session** | The rewriter sees what Claude sees: your CLAUDE.md, memory, the skills, subagents and MCP servers you actually have, and the conversation so far. The prompt puts them to work by name. |
+| **A ladder, priced** | Two or three prompts ordered by what they spend: Quick, Balanced, Deep. The meter `▰▱▱`–`▰▰▰` shows how many tokens and how much time each one asks the agent to spend. The rewriter sizes up the task and recommends one. |
+| **The cache you already paid for** | After the first turn, the rewrite is a fork of the session on the same model, so the prompt cache serves almost all of the input (in the capture above: 1.2k new against 65.6k cached). |
 | **Nothing lost** | The recommended prompt goes into the box only if you have not touched the draft meanwhile. `0` brings the draft back. Sending a prompt clears the band. |
 | **A handoff when the session is heavy** | Past 400k tokens of context (configurable), Balanced and Deep start by leaving a handoff and continue fresh instead of piling on. |
 
@@ -68,9 +59,7 @@ From a shell: `claude plugin install prompt-ladder --marketplace JunSeo99/prompt
 | Key | What it does |
 |---|---|
 | `ctrl+x ctrl+p` | Rewrite the draft. Pressed again while the box holds the draft or a candidate, it moves to the next one: draft → 1 → 2 → 3 → draft. After you edit the box, it rewrites your edited text. |
-| `ctrl+x tab`, then `1` `2` `3` | Put that candidate in the box (focus returns to the prompt) |
-| `0` | Put your original draft back |
-| `r` / `x` | Retry / close the band (`x` also cancels a running rewrite) |
+| `ctrl+x tab`, then a key | Focus the band, then: `1` `2` `3` put that candidate in the box, `0` puts your draft back, `r` retries, `x` closes the band or cancels a running rewrite. Focus returns to the prompt after the press. |
 | `/prompt-ladder <text>` | Rewrite text you type after the command, for when no chord is bound |
 
 ## The ladder
@@ -106,12 +95,12 @@ band above the prompt + recommended rung in the box (only if the draft is unchan
 - **Direct call before the first turn.** There is nothing to fork yet, so prompt-ladder builds the context itself: your CLAUDE.md files and memory index, the skills and commands, subagent types, built-in tools and MCP servers, git branch, and recent messages. Each part is capped, and the context block is cached, so a second rewrite within a few minutes reads most of it from the cache.
 - **The band** is drawn by a `ui.render` hook on the `AbovePrompt` site, with digit hotkeys and an elapsed-time ticker.
 
-Measured on Claude Code 2.1.317, Opus 5.5, in a setup with about 400 skills and commands:
+Measured on Claude Code 2.1.317, Opus 5.5, in a setup with about 400 skills and commands. The fork row covers five runs of the demo above, in English and Korean:
 
 | Path | New input | Cached | Output | Time |
 |---|---|---|---|---|
-| Direct call (first prompt of a session) | 19.2k | 0 | 1.5k–2k | 15–21 s |
-| Session fork (after one turn, ~60k context) | 1.4k | 59.6k | 2k | 18 s |
+| Direct call (first prompt of a session) | 18k–19k | 0–1k | 1.5k–2.1k | 12–25 s |
+| Session fork (after one turn, ~65k context) | 1.2k–2.2k | 63k–66k | 2.6k–5.6k | 26–51 s |
 
 A fork reads the whole context from the cache, so it costs more as the session grows. That is one more reason the handoff below exists.
 
@@ -182,4 +171,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE). prompt-ladder is an independent project, not affiliated with or endorsed by Anthropic. Claude and Claude Code are trademarks of Anthropic.

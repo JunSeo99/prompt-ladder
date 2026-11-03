@@ -1,0 +1,46 @@
+{
+  "name": "prompt-ladder",
+  "version": "0.1.0",
+  "description": "Press ctrl+x ctrl+p on a draft: Claude rewrites it into prompts from quick to deep, priced in tokens and time, right above the prompt box.",
+  "author": {
+    "name": "JunSeo99",
+    "url": "https://github.com/JunSeo99"
+  },
+  "homepage": "https://github.com/JunSeo99/prompt-ladder",
+  "repository": "https://github.com/JunSeo99/prompt-ladder",
+  "license": "MIT",
+  "keywords": [
+    "prompt",
+    "prompt-engineering",
+    "mod",
+    "productivity",
+    "tokens"
+  ],
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "candidates": {
+      "type": "string",
+      "title": "Candidates",
+      "description": "How many rungs to write. 3: quick, balanced, deep. 2: the pair that fits the task (quick+balanced for small work, balanced+deep for large).",
+      "options": [
+        "3",
+        "2"
+      ],
+      "default": "3"
+    },
+    "autofill": {
+      "type": "boolean",
+      "title": "Fill the recommended rung",
+      "description": "Put the recommended candidate in the prompt box when the rewrite lands, as long as you have not edited the draft meanwhile. Off: the box keeps your draft until you pick.",
+      "default": true
+    },
+    "handoffAt": {
+      "type": "number",
+      "title": "Hand off at (k tokens)",
+      "description": "Once the session's context reaches this many thousand tokens, balanced and deep start by leaving a handoff and continue fresh (new session or subagent). 0 turns it off.",
+      "default": 400,
+      "min": 0,
+      "max": 2000
+    }
+  }
+}

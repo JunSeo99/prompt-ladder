@@ -1,0 +1,11 @@
+{
+  "name": "prompt-ladder",
+  "owner": { "name": "JunSeo99" },
+  "plugins": [
+    {
+      "name": "prompt-ladder",
+      "source": "./",
+      "description": "Rewrite a draft into prompts from quick to deep, priced in tokens and time, before you send it."
+    }
+  ]
+}

@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- README (English and Korean): a `validates` badge from the mod catalogue that scanned prompt-ladder, linking to its entry.
+
 ## [0.1.3] - 2026-11-03
 
 ### Changed

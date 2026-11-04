@@ -8,7 +8,7 @@
 
 대충 쓴 초안에서 `ctrl+q`를 누르면, 10분 더 들였으면 썼을 프롬프트를 세션의 맥락으로 대신 써 줍니다. 무엇부터 읽을지, 어떻게 진행할지, 내 스킬과 에이전트 중 무엇을 쓸지, 언제 끝난 것인지까지 들어갑니다. 얼마나 쓸지는 빠르게부터 깊게까지 직접 고릅니다.
 
-[![CI](https://github.com/JunSeo99/prompt-ladder/actions/workflows/ci.yml/badge.svg)](https://github.com/JunSeo99/prompt-ladder/actions/workflows/ci.yml) [![MIT](https://img.shields.io/badge/license-MIT-2f6650)](LICENSE) ![Claude Code mod](https://img.shields.io/badge/Claude%20Code-mod-D97757) ![Tested on 2.1.317](https://img.shields.io/badge/tested%20on-2.1.317-lightgrey)
+[![CI](https://github.com/JunSeo99/prompt-ladder/actions/workflows/ci.yml/badge.svg)](https://github.com/JunSeo99/prompt-ladder/actions/workflows/ci.yml) [![MIT](https://img.shields.io/badge/license-MIT-2f6650)](LICENSE) ![Claude Code mod](https://img.shields.io/badge/Claude%20Code-mod-D97757) ![Tested on 2.1.317](https://img.shields.io/badge/tested%20on-2.1.317-lightgrey) [![validates](https://raw.githubusercontent.com/karanb192/awesome-claude-code-mods/main/badges/JunSeo99--prompt-ladder--prompt-ladder-validates.svg)](https://mods.aidojo.si/mods/JunSeo99--prompt-ladder--prompt-ladder/)
 
 [English](README.md) · **한국어**
 

@@ -10,6 +10,8 @@ Type a rough draft and press `ctrl+q`. prompt-ladder writes the prompt you would
 
 [![CI](https://github.com/JunSeo99/prompt-ladder/actions/workflows/ci.yml/badge.svg)](https://github.com/JunSeo99/prompt-ladder/actions/workflows/ci.yml) [![MIT](https://img.shields.io/badge/license-MIT-2f6650)](LICENSE) ![Claude Code mod](https://img.shields.io/badge/Claude%20Code-mod-D97757) ![Tested on 2.1.317](https://img.shields.io/badge/tested%20on-2.1.317-lightgrey) [![validates](https://raw.githubusercontent.com/karanb192/awesome-claude-code-mods/main/badges/JunSeo99--prompt-ladder--prompt-ladder-validates.svg)](https://mods.aidojo.si/mods/JunSeo99--prompt-ladder--prompt-ladder/)
 
+[![reach](https://raw.githubusercontent.com/karanb192/awesome-claude-code-mods/main/badges/JunSeo99--prompt-ladder--prompt-ladder-reach.svg)](https://mods.aidojo.si/mods/JunSeo99--prompt-ladder--prompt-ladder/)
+
 **English** · [한국어](README.ko.md)
 
 </div>

@@ -6,7 +6,7 @@ All notable changes to this project are documented here. The project follows [Se
 
 ### Changed
 
-- README (English and Korean): a `validates` badge from the mod catalogue that scanned prompt-ladder, linking to its entry.
+- README (English and Korean): `validates` and `reach` badges from the mod catalogue that scanned prompt-ladder, linking to its entry. The wide `reach` badge sits on its own line under the badge row.
 
 ## [0.1.3] - 2026-11-03
 
